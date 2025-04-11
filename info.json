@@ -1,0 +1,13 @@
+{
+  "name": "tiberium-asteroids",
+  "version": "1.0.0",
+  "title": "Tiberium Asteroids",
+  "author": "MsBinaryLily, Fr_Dae",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.28",
+    "Factorio-Tiberium",
+    "(?) planet-muluna"
+  ],
+  "description": "Tiberium crystals - now in space!"
+}

@@ -1,0 +1,17 @@
+- Huge 1% chance
+- Big 10% chance
+- Medium 50%
+- Small 99% chance
+
+corruption, hit a astoird with tiberium seed, when it's break you have 50% chance to convert earch fragment it intro tiberium version. (+5% for quality rocket)
+if you use tiberium seed on tiberium astoid, no effect (100% tiberium resistance)
+if you use blue tiberium seed, you have 75%.
+
+if you use a catalizer missile on a tiberium astoid, you have a 100% chance of exploding it
+if you use blue catalizer missiles, you'll transform the asteroid directly into a chunk
+
+if an asteroid crashes on a space platform, it does very little damage, but releases tiberium in the same way as a tank full of liquid tiberium. 
+
+around nauvis, you have a very small chance of encountering a tiberium asteroid.
+
+it's sometimes possible for a tibierum asteroid to enter the nauvis or tiber atosphere, causing an asteroid crash (creating a tiberium-node).
