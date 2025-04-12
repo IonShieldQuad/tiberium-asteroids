@@ -5,7 +5,7 @@ data:extend({
         icon = "__tiberium-asteroids__/graphics/icons/tiberium-asteroid-crushing.png",
         category = "crushing",
         subgroup = "space-crushing",
-        order = "b-a-a",
+        order = "b-a-t",
         auto_recycle = false,
         enabled = false,
         ingredients =
@@ -28,7 +28,7 @@ data:extend({
         icon = "__tiberium-asteroids__/graphics/icons/advanced-tiberium-asteroid-crushing.png",
         category = "crushing",
         subgroup = "space-crushing",
-        order = "c-a-b",
+        order = "c-a-t",
         auto_recycle = false,
         enabled = false,
         ingredients =
@@ -38,8 +38,8 @@ data:extend({
         energy_required = 5,
         results =
         {
-            { type = "item", name = "tiberium-ore",            amount = 10 },
-            { type = "item", name = "tiberium-ore-blue",       amount = 4 },
+            { type = "item", name = "tiberium-ore",            amount = 15 },
+            { type = "item", name = "tiberium-ore-blue",       amount = 10, probability = 0.1 },
             { type = "item", name = "tiberium-asteroid-chunk", amount = 1, probability = 0.05 }
         },
         allow_productivity = true,
