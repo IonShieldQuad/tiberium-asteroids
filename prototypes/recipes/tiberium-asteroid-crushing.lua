@@ -40,7 +40,7 @@ data:extend({
         {
             { type = "item", name = "tiberium-ore",            amount = 15 },
             { type = "item", name = "tiberium-ore-blue",       amount = 10, probability = 0.1 },
-            { type = "item", name = "tiberium-asteroid-chunk", amount = 1, probability = 0.05 }
+            { type = "item", name = "tiberium-asteroid-chunk", amount = 1,  probability = 0.05 }
         },
         allow_productivity = true,
         allow_decomposition = false
@@ -50,7 +50,25 @@ data:extend({
 
 local tech1 = data.raw["technology"]["space-platform"]
 if mods["planet-muluna"] then
-    tech1 = data.raw["technology"]["crusher"]
+    tech1 = data.raw["technology"]["planet-discovery-muluna"]
+
+    if tech1 == nil then
+        for name, techi in pairs(data.raw["technology"]) do
+            found = false
+            if not string.find(name, "advanced") and not string.find(name, "productivity") then
+                for _, effect in ipairs(techi.effects or {}) do
+                    ---@diagnostic disable-next-line: undefined-field
+                    if effect == "unlock-recipe" and effect.recipe and string.find(effect.recipe, "crusher") and found == false then
+                        found = true
+                        tech1 = techi
+                    end
+                end
+            end
+        end
+    end
+end
+if tech1 == nil then
+    tech1 = data.raw["technology"]["space-platform"]
 end
 table.insert(tech1.effects, {
     type = "unlock-recipe",

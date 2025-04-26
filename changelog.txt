@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2025-04-25
+  Changes:
+    - Spawn tiberium ore on asteroid being damaged near the platform
+    - Added tiberium meteor spawner (for admin only)
+---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 2025-04-12
   Changes:
