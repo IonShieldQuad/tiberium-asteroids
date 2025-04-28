@@ -221,14 +221,9 @@ script.on_event(defines.events.on_tick, function(event)
 
 
 
-            game.play_sound {
+            surface.play_sound {
                 path = "tiberium-asteroid-reentry",
-                position = { x = position.x + speed_x * ticks_to_fall + accel_x * ticks_to_fall ^ 2 / 2, y = position.y - ticks_to_fall * speed_y },
-                volume_modifier = 1,
-            }
-            game.play_sound {
-                path = "tiberium-asteroid-reentry",
-                position = { x = position.x, y = position.y },
+                --position = { x = position.x, y = position.y },
                 volume_modifier = 1,
             }
         end
@@ -261,31 +256,91 @@ script.on_event(defines.events.on_tick, function(event)
 
 
             -- Génère une zone contaminée (optionnel : tuiles ou entités)
-            for x = -CONTAMINATION_RADIUS, CONTAMINATION_RADIUS do
+            --[[for x = -CONTAMINATION_RADIUS, CONTAMINATION_RADIUS do
                 for y = -CONTAMINATION_RADIUS, CONTAMINATION_RADIUS do
                     local dist = math.sqrt(x * x + y * y)
                     if dist <= CONTAMINATION_RADIUS then
-                        local pos = { x = position.x + x, y = position.y + y }
-                        if surface.count_entities_filtered { position = pos, name = NODE_NAME } == 0 then
+                        local pos = { x = position.x + x, y = position.y + y                    if surface.count_entities_filtered { position = pos, name = NODE_NAME } == 0 then
                             surface.create_entity { name = "tiberium-ore", position = pos, force = "neutral", amount = 100 * settings.startup["tiberium-growth"].value }
                         end
                     end
                 end
+            end--]]
+
+            local locations = {
+                { x = position.x, y = position.y}
+            }
+            
+
+            local locations2 = {}
+            local l2num = math.random(4, 8)
+
+
+            for i = 1, 100, 1 do
+                if #locations2 < l2num then
+            
+            
+                    local angle = math.random() * 2 * math.pi
+                    local radius = math.random(CONTAMINATION_RADIUS, CONTAMINATION_RADIUS + 6)
+                    local x = position.x + math.cos(angle) * radius
+                    local y = position.y + math.sin(angle) * radius
+                    local pos = { x = x, y = y}
+                    if surface.count_tiles_filtered{position = pos, name = "empty-space", invert = true} then
+                        table.insert(locations2, pos)
+                    end
+
+
+                end
+                --surface.create_entity { name = NODE_NAME, position = { x = x, y = y }, force = "neutral", amount = 1e5, raise_built = true }
             end
-            for i = 1, math.random(4, 8), 1 do
-                local angle = math.random() * 2 * math.pi
-                local radius = math.random(CONTAMINATION_RADIUS, CONTAMINATION_RADIUS + 6)
-                local x = position.x + math.cos(angle) * radius
-                local y = position.y + math.sin(angle) * radius
-                surface.create_entity { name = NODE_NAME, position = { x = x, y = y }, force = "neutral", amount = 1e5, raise_built = true }
+
+            local locations3 = {}
+            local l3num = math.random(4, 8)
+
+
+            for i = 1, 100, 1 do
+                 if #locations3 < l3num then
+                    local angle = math.random() * 2 * math.pi
+                    local radius = math.random(CONTAMINATION_RADIUS / 2, CONTAMINATION_RADIUS / 2 + 6)
+                    local x = position.x + math.cos(angle) * radius
+                    local y = position.y + math.sin(angle) * radius
+                    local pos = { x = x, y = y }
+                    if surface.count_tiles_filtered { position = pos, name = "empty-space", invert = true } then
+                        table.insert(locations3, pos)
+                    end
+                 end
+                --surface.create_entity { name = NODE_NAME, position = { x = x, y = y }, force = "neutral", amount = 1e5, raise_built = true }
             end
-            for i = 1, math.random(4, 8), 1 do
-                local angle = math.random() * 2 * math.pi
-                local radius = math.random(CONTAMINATION_RADIUS / 2, CONTAMINATION_RADIUS / 2 + 6)
-                local x = position.x + math.cos(angle) * radius
-                local y = position.y + math.sin(angle) * radius
-                surface.create_entity { name = NODE_NAME, position = { x = x, y = y }, force = "neutral", amount = 1e5, raise_built = true }
+
+            for _, value in ipairs(locations2) do
+                table.insert(locations, value)
             end
+            for _, value in ipairs(locations3) do
+                table.insert(locations, value)
+            end
+
+
+            for _, pos in ipairs(locations) do
+                surface.create_entity { name = NODE_NAME, position = pos, force = "neutral", amount = _ == 1 and 1e6 or 1e5, raise_built = true }
+                local tank = surface.create_entity {
+                        name = "tib-dummy-storage-tank",
+                        position = pos,
+                        force = "neutral",
+                    }
+                    if tank then
+                        tank.insert_fluid({
+                            name = "liquid-tiberium",
+                            amount = 1e6
+                        })
+
+                        tank.die()
+                    end
+                if surface.count_entities_filtered{position = pos, name = NODE_NAME} == 0 then
+                    surface.create_entity { name = NODE_NAME, position = pos, force = "neutral", amount = _ == 1 and 1e6 or 1e5, raise_built = true }
+                end
+
+            end
+
 
 
 

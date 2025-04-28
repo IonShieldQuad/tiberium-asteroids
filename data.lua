@@ -31,8 +31,8 @@ data:extend({
         name = "tiberium-asteroid-remote",
         icon = "__tiberium-asteroids__/graphics/icons/tiberium-asteroid-remote.png",
         icon_size = 64,
-        flags = { "only-in-cursor", "spawnable" },
-        subgroup = "tool",
+        flags = {  },
+        subgroup = "a-items",
         order = "z[tiberium-asteroid-remote]",
         stack_size = 1,
         select = {
@@ -46,6 +46,7 @@ data:extend({
             mode = "nothing"
         },
         skip_fog_of_war = true,
+        hidden = true,
         hidden_in_factoriopedia = true
     }
 })
@@ -97,7 +98,7 @@ data:extend({
         filename = "__tiberium-asteroids__/sounds/meteor.ogg",
         audible_distance_modifier = 1,
         priority = 4,
-        volume = 4
-
+        volume = 4,
+        category = "alert"
     }
 })
