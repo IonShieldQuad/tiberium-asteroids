@@ -53,21 +53,25 @@ local shared_resistances =
 {
   physical =
   {
-    decrease = {0, 0, 0, 2000, 3000},
-    percent = {0, 0, 10, 10, 10}
+    decrease = {10, 10, 10, 2000, 3000},
+    percent = {0, 20, 30, 40, 50}
   },
   explosion =
   {
     decrease = {0, 0, 0, 0, 0},
-    percent = {0, 50, 30, 10, 99}
+    percent = {0, 10, 20, 30, 30}
   },
   laser =
   {
     decrease = {0, 0, 0, 0, 0},
-    percent = {0, 20, 90, 95, 99}
+    percent = {0, 0, 75, 90, 95}
+  },
+  tiberium = {
+    decrease = { 0, 0, 0, 0, 0 },
+    percent = { 100, 100, 100, 100, 100 }
   },
 }
-local shared_health = {0, 100, 400, 2000, 5000}
+local shared_health = {0, 200, 800, 4000, 10000}
 local shared_mass = {0, 200000, 500000, 5000000, 100000000}
 local asteroids_data =
 {

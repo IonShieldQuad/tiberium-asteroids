@@ -299,3 +299,107 @@ for name, conn in pairs(data.raw["space-connection"]) do
         end
     end
 end
+
+
+local tech1 = data.raw["technology"]["tiberium-ore-destruction"]
+local tech2 = data.raw["technology"]["tiberium-nuke"]
+--local seed = data.raw["ammo"]["tiberium-seed"]
+
+local function make_homing_version(ammo, projectile, tech)
+    local item = table.deepcopy(ammo)
+    item.localised_name = ammo.localised_name or { "item-name." .. ammo.name }
+    item.localised_description = ammo.localised_description or { "item-description." .. ammo.name }
+    item.name = ammo.name .. "-h"
+    item.ammo_type.target_type = "entity"
+    item.order = "zh-" .. item.order
+
+    local proj = table.deepcopy(projectile)
+    if proj.turn_speed == nil or proj.turn_speed < 0.1 then
+        proj.turn_speed = 0.1
+    end
+    proj.name = projectile.name .. "-h"
+
+    if proj.action.action_delivery then
+        table.insert(proj.action.action_delivery.target_effects, {
+            type = "damage",
+            damage = {
+                amount = 10,
+                type = "physical"
+            }
+        })
+    else
+        table.insert(proj.action, {
+            type = "direct",
+            action_delivery = {
+                type = "instant",
+                target_effects = {
+                    {
+                        type = "damage",
+                        damage = {
+                            amount = 10,
+                            type = "physical"
+                        }
+                    }
+                }
+            }
+        })
+    end
+
+    item.ammo_type.action.action_delivery.projectile = proj.name
+    if not item.icons then
+        item.icons = {
+            {
+                icon = item.icon,
+                icon_size = item.icon_size
+            },
+            {
+                icon = "__tiberium-asteroids__/graphics/icons/signal-target.png",
+                icon_size = 64,
+                tint = { 0, 0.7, 0, 0.7 }
+            }
+        }
+    else
+        local size = 1
+        for _, ic in ipairs(item.icons or {}) do
+            if ic.icon_size and ic.icon_size * (ic.scale and (ic.scale / 0.5) or 0.5) > size then
+                size = ic.icon_size * (ic.scale and (ic.scale / 0.5) or 0.5)
+            end
+        end
+        table.insert(item.icons,
+            {
+                icon = "__tiberium-asteroids__/graphics/icons/signal-target.png",
+                icon_size = 64,
+                scale = 0.5 * size / 64,
+                tint = { 0, 0.7, 0, 0.7 }
+            })
+    end
+
+    local recipe = {
+        type = "recipe",
+        name = item.name,
+        icons = item.icons,
+        enabled = false,
+        localised_name = item.localised_name,
+        ingredients = { { type = "item", name = ammo.name, amount = 1 } },
+        results = { { type = "item", name = item.name, amount = 1 } },
+        allow_productivity = false
+    }
+
+
+    data.extend({ item, proj, recipe })
+
+    table.insert(tech.effects, {
+        type = "unlock-recipe",
+        recipe = item.name
+    })
+end
+
+--make_homing_version(seed, tech2)
+
+make_homing_version(data.raw.ammo["tiberium-catalyst-missile-all"], data.raw.projectile["tiberium-catalyst-missile-all"],
+    tech1)
+make_homing_version(data.raw.ammo["tiberium-catalyst-missile-blue"],
+    data.raw.projectile["tiberium-catalyst-missile-blue"],
+    tech1)
+make_homing_version(data.raw.ammo["tiberium-seed"], data.raw.projectile["tiberium-seed"], tech2)
+make_homing_version(data.raw.ammo["tiberium-seed-blue"], data.raw.projectile["tiberium-seed-blue"], tech2)

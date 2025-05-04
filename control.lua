@@ -1,6 +1,68 @@
 require("util")
 
 script.on_event(defines.events.on_entity_damaged, function(event)
+    if event.entity.valid and event.entity.type == "asteroid" and not string.find(event.entity.name, "tiberium") then
+        local asteroid = event.entity
+
+        if asteroid and asteroid.valid and asteroid.surface.valid then
+            local asteroid_sizes = { "chunk", "small", "medium", "big", "huge" }
+            local shared_health = { 0, 200, 800, 4000, 10000 }
+            local size = nil
+            local sizei = nil
+            for _, name in ipairs(asteroid_sizes) do
+                if string.find(asteroid.name, name) then
+                    size = name
+                    sizei = _
+                end
+            end
+
+            if asteroid.health <= 0 and event.damage_type == "tiberium" and math.random() > 0.75 then
+                asteroid.surface.create_entity {
+                    name = "tiberium-asteroid-chunk",
+                    position = asteroid.position,
+                    orientation = asteroid.orientation,
+                    speed = asteroid.speed
+                }
+            end
+
+
+
+
+            if event.source and (event.source.name == "tiberium-seed" or event.source.name == "tiberium-seed-h") then
+                if sizei and math.random() > 0.5 then
+                    asteroid.surface.create_entity {
+                        name = "tiberium-asteroid-explosion-" .. tostring(sizei),
+                        position = asteroid.position
+                    }
+                    asteroid.surface.create_entity {
+                        name = tostring(size) .. "-tiberium-asteroid",
+                        position = asteroid.position,
+                        health = asteroid.get_health_ratio() * shared_health[sizei],
+                        orientation = asteroid.orientation,
+                        speed = asteroid.speed
+                    }
+                    asteroid.destroy()
+                end
+            elseif event.source and (event.source.name == "tiberium-seed-blue" or event.source.name == "tiberium-seed-blue-h") then
+                if sizei then
+                    asteroid.surface.create_entity {
+                        name = "tiberium-asteroid-explosion-" .. tostring(sizei),
+                        position = asteroid.position
+                    }
+                    asteroid.surface.create_entity {
+                        name = tostring(size) .. "-tiberium-asteroid",
+                        position = asteroid.position,
+                        health = asteroid.get_health_ratio() * shared_health[sizei],
+                        orientation = asteroid.orientation,
+                        speed = asteroid.speed
+                    }
+                    asteroid.destroy()
+                end
+            end
+
+
+        end
+    end
     if event.entity.valid and event.entity.type == "asteroid" and string.find(event.entity.name, "tiberium") then
         local asteroid = event.entity
 
@@ -26,58 +88,100 @@ script.on_event(defines.events.on_entity_damaged, function(event)
 
         --if asteroid and asteroid.valid and asteroid.surface.valid and not event.source then
         if asteroid and asteroid.valid and asteroid.surface.valid then
-            local tiles = nil
-            local iter = 1
-            tiles = asteroid.surface.find_tiles_filtered {
-                position = asteroid.position,
-                radius = 5,
-                name = "empty-space",
-                invert = true
-            }
-            if #tiles == 0 then
-                iter = 2
-                tiles = asteroid.surface.find_tiles_filtered {
-                    position = asteroid.position,
-                    radius = 10,
-                    name = "empty-space",
-                    invert = true
-                }
-            end
-            if #tiles == 0 then
-                iter = 3
-                tiles = asteroid.surface.find_tiles_filtered {
-                    position = asteroid.position,
-                    radius = 15,
-                    name = "empty-space",
-                    invert = true
-                }
-            end
-            if #tiles > 0 then
-                local tile = nil
-                while #tiles > 0 and (not tile or not tile.valid) do
-                    local ntile = math.random(#tiles)
-                    tile = tiles[ntile]
-                    if not tile and tile.valid then
-                        table.remove(tiles, ntile)
-                    end
+            local asteroid_sizes = { "chunk", "small", "medium", "big", "huge" }
+
+            local size = nil
+            local sizei = nil
+            for _, name in ipairs(asteroid_sizes) do
+                if string.find(asteroid.name, name) then
+                    size = name
+                    sizei = _
                 end
+            end
 
-                if tile and tile.valid then
-                    local tank = asteroid.surface.create_entity {
-                        name = "tib-dummy-storage-tank",
-                        position = tile.position,
-                        force = "neutral",
-                        source = asteroid,
-                        cause = asteroid
+
+
+
+            if event.source and (event.source.name == "tiberium-catalyst-missile-all" or event.source.name == "tiberium-catalyst-missile-all-h") then
+                asteroid.die()
+            elseif event.source and (event.source.name == "tiberium-catalyst-missile-blue" or event.source.name == "tiberium-catalyst-missile-blue-h") then
+                if sizei then
+                    asteroid.surface.create_entity {
+                        name = "tiberium-asteroid-explosion-" .. tostring(sizei),
+                        position = asteroid.position
                     }
-                    if tank then
-                        tank.insert_fluid({
-                            name = "liquid-tiberium",
-                            amount = math.max(1,
-                                math.abs(event.final_damage_amount / iter))
-                        })
+                end
+                asteroid.destroy()
+            else
+                local tiles = nil
+                local srf = 0
+                local iter = 1
+                tiles = asteroid.surface.find_tiles_filtered {
+                    position = asteroid.position,
+                    radius = 5,
+                    name = "empty-space",
+                    invert = true
+                }
+                srf = asteroid.surface.count_entities_filtered {
+                    position = asteroid.position,
+                    radius = 5,
+                    name = "tiberium-srf-wall"
+                }
+                if #tiles == 0 then
+                    iter = 2
+                    tiles = asteroid.surface.find_tiles_filtered {
+                        position = asteroid.position,
+                        radius = 10,
+                        name = "empty-space",
+                        invert = true
+                    }
+                    srf = asteroid.surface.count_entities_filtered {
+                        position = asteroid.position,
+                        radius = 10,
+                        name = "tiberium-srf-wall"
+                    }
+                end
+                if #tiles == 0 then
+                    iter = 3
+                    tiles = asteroid.surface.find_tiles_filtered {
+                        position = asteroid.position,
+                        radius = 15,
+                        name = "empty-space",
+                        invert = true
+                    }
+                    srf = asteroid.surface.count_entities_filtered {
+                        position = asteroid.position,
+                        radius = 15,
+                        name = "tiberium-srf-wall"
+                    }
+                end
+                if #tiles > 0 and srf == 0 then
+                    local tile = nil
+                    while #tiles > 0 and (not tile or not tile.valid) do
+                        local ntile = math.random(#tiles)
+                        tile = tiles[ntile]
+                        if not tile and tile.valid then
+                            table.remove(tiles, ntile)
+                        end
+                    end
 
-                        tank.die()
+                    if tile and tile.valid then
+                        local tank = asteroid.surface.create_entity {
+                            name = "tib-dummy-storage-tank",
+                            position = tile.position,
+                            force = "neutral",
+                            source = asteroid,
+                            cause = asteroid
+                        }
+                        if tank then
+                            tank.insert_fluid({
+                                name = "liquid-tiberium",
+                                amount = math.max(1,
+                                    math.abs(event.final_damage_amount / iter))
+                            })
+
+                            tank.die()
+                        end
                     end
                 end
             end
@@ -232,13 +336,13 @@ script.on_event(defines.events.on_tick, function(event)
             if strike.sprite_id.valid then
                 local y = position.y - (speed_y * (ticks_to_fall - ticks_elapsed))
                 local x = position.x + speed_x * (ticks_to_fall - ticks_elapsed) +
-                accel_x * (ticks_to_fall - ticks_elapsed) ^ 2 / 2
+                    accel_x * (ticks_to_fall - ticks_elapsed) ^ 2 / 2
                 strike.sprite_id.target = { x = x, y = y }
             end
             if strike.light.valid then
                 local y = position.y - (speed_y * (ticks_to_fall - ticks_elapsed))
                 local x = position.x + speed_x * (ticks_to_fall - ticks_elapsed) +
-                accel_x * (ticks_to_fall - ticks_elapsed) ^ 2 / 2
+                    accel_x * (ticks_to_fall - ticks_elapsed) ^ 2 / 2
                 strike.light.target = { x = x, y = y }
             end
         end
@@ -268,9 +372,9 @@ script.on_event(defines.events.on_tick, function(event)
             end--]]
 
             local locations = {
-                { x = position.x, y = position.y}
+                { x = position.x, y = position.y }
             }
-            
+
 
             local locations2 = {}
             local l2num = math.random(4, 8)
@@ -278,18 +382,14 @@ script.on_event(defines.events.on_tick, function(event)
 
             for i = 1, 100, 1 do
                 if #locations2 < l2num then
-            
-            
                     local angle = math.random() * 2 * math.pi
                     local radius = math.random(CONTAMINATION_RADIUS, CONTAMINATION_RADIUS + 6)
                     local x = position.x + math.cos(angle) * radius
                     local y = position.y + math.sin(angle) * radius
-                    local pos = { x = x, y = y}
-                    if surface.count_tiles_filtered{position = pos, name = "empty-space", invert = true} then
+                    local pos = { x = x, y = y }
+                    if surface.count_tiles_filtered { position = pos, name = "empty-space", invert = true } then
                         table.insert(locations2, pos)
                     end
-
-
                 end
                 --surface.create_entity { name = NODE_NAME, position = { x = x, y = y }, force = "neutral", amount = 1e5, raise_built = true }
             end
@@ -299,7 +399,7 @@ script.on_event(defines.events.on_tick, function(event)
 
 
             for i = 1, 100, 1 do
-                 if #locations3 < l3num then
+                if #locations3 < l3num then
                     local angle = math.random() * 2 * math.pi
                     local radius = math.random(CONTAMINATION_RADIUS / 2, CONTAMINATION_RADIUS / 2 + 6)
                     local x = position.x + math.cos(angle) * radius
@@ -308,7 +408,7 @@ script.on_event(defines.events.on_tick, function(event)
                     if surface.count_tiles_filtered { position = pos, name = "empty-space", invert = true } then
                         table.insert(locations3, pos)
                     end
-                 end
+                end
                 --surface.create_entity { name = NODE_NAME, position = { x = x, y = y }, force = "neutral", amount = 1e5, raise_built = true }
             end
 
@@ -323,22 +423,21 @@ script.on_event(defines.events.on_tick, function(event)
             for _, pos in ipairs(locations) do
                 surface.create_entity { name = NODE_NAME, position = pos, force = "neutral", amount = _ == 1 and 1e6 or 1e5, raise_built = true }
                 local tank = surface.create_entity {
-                        name = "tib-dummy-storage-tank",
-                        position = pos,
-                        force = "neutral",
-                    }
-                    if tank then
-                        tank.insert_fluid({
-                            name = "liquid-tiberium",
-                            amount = 1e6
-                        })
+                    name = "tib-dummy-storage-tank",
+                    position = pos,
+                    force = "neutral",
+                }
+                if tank then
+                    tank.insert_fluid({
+                        name = "liquid-tiberium",
+                        amount = 1e6
+                    })
 
-                        tank.die()
-                    end
-                if surface.count_entities_filtered{position = pos, name = NODE_NAME} == 0 then
+                    tank.die()
+                end
+                if surface.count_entities_filtered { position = pos, name = NODE_NAME } == 0 then
                     surface.create_entity { name = NODE_NAME, position = pos, force = "neutral", amount = _ == 1 and 1e6 or 1e5, raise_built = true }
                 end
-
             end
 
 
