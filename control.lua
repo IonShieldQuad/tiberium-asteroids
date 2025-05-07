@@ -1,20 +1,92 @@
 require("util")
 
+
+local function asteroid_size(asteroid)
+    local asteroid_sizes = { "chunk", "small", "medium", "big", "huge" }
+    local shared_health = { 0, 200, 800, 4000, 10000 }
+    local size = nil
+    local sizei = nil
+    for _, name in ipairs(asteroid_sizes) do
+        if string.find(asteroid.name, name) then
+            size = name
+            sizei = _
+        end
+    end
+
+    return size, sizei
+end
+
+
+script.on_event(defines.events.on_script_trigger_effect, function(event)
+    if event.source_entity and event.source_entity.valid and event.source_entity.surface and event.source_entity.surface.valid then
+        if event.effect_id == "ore-destruction-blue" or event.effect_id == "ore-destruction-all" or event.effect_id == "seed-launch" or "seed-launch-blue" then
+            local missile = event.source_entity or {}
+
+
+            local asteroids = missile.surface.find_entities_filtered {
+                position = missile.position,
+                radius = 3,
+                type = "asteroid"
+            }
+
+            if event.effect_id == "ore-destruction-blue" or event.effect_id == "ore-destruction-all" then
+                for _, asteroid in ipairs(asteroids) do
+                    if asteroid.valid and string.find(asteroid.name, "tiberium") then
+                        local size
+                        local sizei
+                        size, sizei = asteroid_size(asteroid)
+
+                        if sizei and event.effect_id == "ore-destruction-blue" then
+                            if sizei then
+                                asteroid.surface.create_entity {
+                                    name = "tiberium-asteroid-explosion-" .. tostring(sizei),
+                                    position = asteroid.position
+                                }
+                            end
+                            asteroid.destroy()
+                        end
+                        if sizei and event.effect_id == "ore-destruction-all" then
+                            asteroid.die()
+                        end
+                    end
+                end
+            else
+                for _, asteroid in ipairs(asteroids) do
+                    if asteroid.valid and not string.find(asteroid.name, "tiberium") then
+                        local size
+                        local sizei
+                        size, sizei = asteroid_size(asteroid)
+                        local shared_health = { 0, 200, 800, 4000, 10000 }
+                        if size and sizei and (event.effect_id == "seed-launch-blue" or (event.effect_id == "seed-launch" and math.random > 0.5)) then
+                            asteroid.surface.create_entity {
+                                name = "tiberium-asteroid-explosion-" .. tostring(sizei),
+                                position = asteroid.position
+                            }
+                            asteroid.surface.create_entity {
+                                name = tostring(size) .. "-tiberium-asteroid",
+                                position = asteroid.position,
+                                health = asteroid.get_health_ratio() * shared_health[sizei],
+                                orientation = asteroid.orientation,
+                                speed = asteroid.speed
+                            }
+                            asteroid.destroy()
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
 script.on_event(defines.events.on_entity_damaged, function(event)
     if event.entity.valid and event.entity.type == "asteroid" and not string.find(event.entity.name, "tiberium") then
         local asteroid = event.entity
 
         if asteroid and asteroid.valid and asteroid.surface.valid then
-            local asteroid_sizes = { "chunk", "small", "medium", "big", "huge" }
             local shared_health = { 0, 200, 800, 4000, 10000 }
             local size = nil
             local sizei = nil
-            for _, name in ipairs(asteroid_sizes) do
-                if string.find(asteroid.name, name) then
-                    size = name
-                    sizei = _
-                end
-            end
+            size, sizei = asteroid_size(asteroid)
 
             if asteroid.health <= 0 and event.damage_type == "tiberium" and math.random() > 0.75 then
                 asteroid.surface.create_entity {
@@ -59,8 +131,6 @@ script.on_event(defines.events.on_entity_damaged, function(event)
                     asteroid.destroy()
                 end
             end
-
-
         end
     end
     if event.entity.valid and event.entity.type == "asteroid" and string.find(event.entity.name, "tiberium") then
