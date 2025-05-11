@@ -188,30 +188,30 @@ script.on_event(defines.events.on_entity_damaged, function(event)
                 local iter = 1
                 tiles = asteroid.surface.find_tiles_filtered {
                     position = asteroid.position,
-                    radius = 5,
+                    radius = 6,
                     name = "empty-space",
                     invert = true
                 }
                 srf = asteroid.surface.count_entities_filtered {
                     position = asteroid.position,
-                    radius = 5,
+                    radius = 10,
                     name = "tiberium-srf-wall"
                 }
                 if #tiles == 0 then
                     iter = 2
                     tiles = asteroid.surface.find_tiles_filtered {
                         position = asteroid.position,
-                        radius = 10,
+                        radius = 12,
                         name = "empty-space",
                         invert = true
                     }
                     srf = asteroid.surface.count_entities_filtered {
                         position = asteroid.position,
-                        radius = 10,
+                        radius = 15,
                         name = "tiberium-srf-wall"
                     }
                 end
-                if #tiles == 0 then
+                --[[if #tiles == 0 then
                     iter = 3
                     tiles = asteroid.surface.find_tiles_filtered {
                         position = asteroid.position,
@@ -221,10 +221,10 @@ script.on_event(defines.events.on_entity_damaged, function(event)
                     }
                     srf = asteroid.surface.count_entities_filtered {
                         position = asteroid.position,
-                        radius = 15,
+                        radius = 20,
                         name = "tiberium-srf-wall"
                     }
-                end
+                end--]]
                 if #tiles > 0 and srf == 0 then
                     local tile = nil
                     while #tiles > 0 and (not tile or not tile.valid) do
@@ -247,7 +247,7 @@ script.on_event(defines.events.on_entity_damaged, function(event)
                             tank.insert_fluid({
                                 name = "liquid-tiberium",
                                 amount = math.max(1,
-                                    math.abs(event.final_damage_amount / iter))
+                                    math.abs(event.final_damage_amount / iter ^ 2))
                             })
 
                             tank.die()
@@ -396,9 +396,9 @@ script.on_event(defines.events.on_tick, function(event)
             strike.shadow = rendering.draw_sprite {
                 sprite = ASTEROID_SPRITE,
                 surface = surface,
-                tint = {0, 0, 0, 0.9},
+                tint = { 0, 0, 0, 0.9 },
                 draw_as_shadow = true,
-                target = { x = position.x, y = position.y},
+                target = { x = position.x, y = position.y },
                 target_offset = { 0, 0 },
                 x_scale = 1,
                 y_scale = 1,
