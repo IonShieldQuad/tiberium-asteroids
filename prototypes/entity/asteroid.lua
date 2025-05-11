@@ -53,8 +53,8 @@ local shared_resistances =
 {
   physical =
   {
-    decrease = {10, 10, 10, 2000, 3000},
-    percent = {0, 20, 30, 40, 50}
+    decrease = {0, 10, 20, 2000, 3000},
+    percent = {0, 20, 40, 50, 75}
   },
   explosion =
   {
@@ -64,7 +64,7 @@ local shared_resistances =
   laser =
   {
     decrease = {0, 0, 0, 0, 0},
-    percent = {0, 0, 75, 90, 95}
+    percent = {0, 0, 50, 80, 90}
   },
   tiberium = {
     decrease = { 0, 0, 0, 0, 0 },

@@ -362,6 +362,7 @@ script.on_event(defines.events.on_tick, function(event)
                         time_to_live = 300,
                         speed = 1 / 60
                     })
+                    player.print(string.format("[gps=%s,%s,%s]", position.x, position.y, surface.index))
                 end
             end
         end
@@ -392,7 +393,18 @@ script.on_event(defines.events.on_tick, function(event)
                 color = { 0, 1, 0 },
                 visible = true
             }
-
+            strike.shadow = rendering.draw_sprite {
+                sprite = ASTEROID_SPRITE,
+                surface = surface,
+                tint = {0, 0, 0, 0.9},
+                draw_as_shadow = true,
+                target = { x = position.x, y = position.y},
+                target_offset = { 0, 0 },
+                x_scale = 1,
+                y_scale = 1,
+                render_layer = "object-under",
+                visible = true
+            }
 
 
             surface.play_sound {
@@ -424,10 +436,13 @@ script.on_event(defines.events.on_tick, function(event)
             if strike.light.valid then
                 strike.light.destroy()
             end
+            if strike.shadow.valid then
+                strike.shadow.destroy()
+            end
             -- Impact (t = 12)
             surface.create_entity { name = "big-explosion", position = position }
             surface.create_entity { name = NODE_NAME, position = position, force = "neutral", amount = 1e6, raise_built = true }
-
+            surface.create_entity { name = "atomic-rocket", position = position, force = "neutral", target = position }
 
             -- Génère une zone contaminée (optionnel : tuiles ou entités)
             --[[for x = -CONTAMINATION_RADIUS, CONTAMINATION_RADIUS do
