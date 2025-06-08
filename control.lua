@@ -268,9 +268,21 @@ local CONTAMINATION_RADIUS = 20
 script.on_event(defines.events.on_player_selected_area, function(event)
     if event.item == "tiberium-asteroid-remote" then
         local player = game.players[event.player_index]
-        if not (player.admin and player.cheat_mode) then
+        --[[if not (player.admin and player.cheat_mode) then
             player.print("Only admins in editor mode can use this remote.")
             return
+        end--]]
+        local inventory = (player and player.valid) and player.get_main_inventory() or nil
+
+        if inventory and inventory.valid then
+            local stack = inventory.find_item_stack(event.item)
+            if stack and stack.valid and stack.count > 0 then
+                if stack.count == 1 then
+                    stack.clear()
+                else
+                    stack.count = stack.count - 1
+                end
+            end
         end
 
         local position = event.area.left_top
@@ -287,8 +299,9 @@ script.on_event(defines.events.on_player_selected_area, function(event)
             initial_tick = event.tick,
             alert_tick = event.tick + 5 * 60, -- 5 seconds
             spawn_tick = event.tick + 8 * 60, -- 8 sceonds
-            end_tick = event.tick + 30 * 60   -- 12 seconds
-
+            end_tick = event.tick + 30 * 60,   -- 12 seconds
+            rotation_rate = (math.random() - 0.5) / 120,
+            initial_rotation = math.random()
         })
 
         --[[ t = 5s : Message d'alerte
@@ -415,17 +428,29 @@ script.on_event(defines.events.on_tick, function(event)
         end
         if tick > strike.spawn_tick and tick < strike.end_tick then
             local ticks_elapsed = tick - strike.spawn_tick
+            local orientation = strike.initial_rotation + ticks_elapsed * strike.rotation_rate 
+            if orientation < 0 then
+                orientation = orientation + math.ceil(math.abs(orientation))
+            else
+                orientation = orientation - math.floor(orientation)
+            end
+
             if strike.sprite_id.valid then
                 local y = position.y - (speed_y * (ticks_to_fall - ticks_elapsed))
                 local x = position.x + speed_x * (ticks_to_fall - ticks_elapsed) +
                     accel_x * (ticks_to_fall - ticks_elapsed) ^ 2 / 2
                 strike.sprite_id.target = { x = x, y = y }
+                strike.sprite_id.orientation = orientation
             end
             if strike.light.valid then
                 local y = position.y - (speed_y * (ticks_to_fall - ticks_elapsed))
                 local x = position.x + speed_x * (ticks_to_fall - ticks_elapsed) +
                     accel_x * (ticks_to_fall - ticks_elapsed) ^ 2 / 2
                 strike.light.target = { x = x, y = y }
+                strike.light.orientation = orientation
+            end
+            if strike.shadow.valid then
+                strike.shadow.orientation = orientation
             end
         end
 
@@ -521,7 +546,7 @@ script.on_event(defines.events.on_tick, function(event)
                     tank.die()
                 end
                 if surface.count_entities_filtered { position = pos, name = NODE_NAME } == 0 then
-                    surface.create_entity { name = NODE_NAME, position = pos, force = "neutral", amount = _ == 1 and 1e6 or 1e5, raise_built = true }
+                    --surface.create_entity { name = NODE_NAME, position = pos, force = "neutral", amount = _ == 1 and 1e6 or 1e5, raise_built = true }
                 end
             end
 

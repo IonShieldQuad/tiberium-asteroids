@@ -46,8 +46,7 @@ data:extend({
             mode = "nothing"
         },
         skip_fog_of_war = true,
-        hidden = true,
-        hidden_in_factoriopedia = true
+        hidden = false,
     }
 })
 
