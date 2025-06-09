@@ -1,44 +1,9 @@
---[[data:extend({
-    {
-        type = "int-setting",
-        name = "tbg-search-radius",
-        setting_type = "runtime-global",
-        default_value = 10,
-        minimum_value = 1,
-        maximum_value = 32,
-        order = "a",
-    },
-    {
-        type = "int-setting",
-        name = "tbg-max-per-tile",
-        setting_type = "runtime-global",
-        minimum_value = 1,
-        default_value = 1000,
-        order = "b",
-    },
+data:extend({
     {
         type = "bool-setting",
-        name = "tbg-separate-glow",
-        setting_type = "runtime-global",
-        default_value = true,
-        order = "c",
+        name = "tib-asteroids-enable-tech",
+        setting_type = "startup",
+        default_value = false,
+        order = "a",
     },
-    {
-        type = "double-setting",
-        name = "tbg-intensity-mult",
-        setting_type = "runtime-global",
-        default_value = 1,
-        minimum_value = 0,
-        maximum_value = 100,
-        order = "d",
-    },
-    {
-        type = "double-setting",
-        name = "tbg-scale-mult",
-        setting_type = "runtime-global",
-        default_value = 1,
-        minimum_value = 0,
-        maximum_value = 100,
-        order = "e",
-    },
-})--]]
+})

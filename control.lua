@@ -273,14 +273,32 @@ script.on_event(defines.events.on_player_selected_area, function(event)
             return
         end--]]
         local inventory = (player and player.valid) and player.get_main_inventory() or nil
-
+        local removed = false
         if inventory and inventory.valid then
             local stack = inventory.find_item_stack(event.item)
             if stack and stack.valid and stack.count > 0 then
                 if stack.count == 1 then
                     stack.clear()
+                    removed = true
                 else
                     stack.count = stack.count - 1
+                    removed = true
+                end
+            end
+        end
+
+        if not removed then
+            player.clear_cursor()
+            if inventory and inventory.valid then
+                local stack = inventory.find_item_stack(event.item)
+                if stack and stack.valid and stack.count > 0 then
+                    if stack.count == 1 then
+                        stack.clear()
+                        removed = true
+                    else
+                        stack.count = stack.count - 1
+                        removed = true
+                    end
                 end
             end
         end

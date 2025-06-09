@@ -31,7 +31,7 @@ data:extend({
         name = "tiberium-asteroid-remote",
         icon = "__tiberium-asteroids__/graphics/icons/tiberium-asteroid-remote.png",
         icon_size = 64,
-        flags = {  },
+        flags = {},
         subgroup = "a-items",
         order = "z[tiberium-asteroid-remote]",
         stack_size = 1,
@@ -50,6 +50,63 @@ data:extend({
     }
 })
 
+data:extend({
+    {
+        type = "recipe",
+        name = "tiberium-asteroid-remote",
+        category = "advanced-crafting",
+        ingredients = {
+            { type = "item",  name = "tiberium-blue-explosives", amount = 500 },
+            { type = "item",  name = "tiberium-ore",             amount = 5000 },
+            { type = "item",  name = "tiberium-asteroid-chunk",  amount = 2500 },
+            { type = "item",  name = "rocket-fuel",              amount = 1000 },
+            { type = "fluid", name = "liquid-tiberium",          amount = 50000 },
+        },
+        results = {
+            { type = "item", name = "tiberium-asteroid-remote", amount = 1, ignored_by_productivity = 100 },
+        },
+        allow_productivity = false,
+        surface_conditions = {
+            {
+                property = "gravity",
+                max = 0
+            }
+        },
+        enabled = false
+    }
+})
+
+if settings.startup["tib-asteroids-enable-tech"].value then
+    data:extend({
+        {
+            type = "technology",
+            name = "tiberium-asteroid-remote",
+            icon = "__tiberium-asteroids__/graphics/entity/asteroid/tiberium/huge/asteroid-tiberium-huge-colour-01.png",
+            icon_size = 512,
+            effects = {
+                {
+                    type = "unlock-recipe",
+                    recipe = "tiberium-asteroid-remote"
+                },
+            },
+            prerequisites = { "tiberium-nuke" },
+            unit = {
+                count = 20000,
+                ingredients = {
+                    { "tiberium-science",        1 },
+                    { "automation-science-pack", 1 },
+                    { "logistic-science-pack",   1 },
+                    { "military-science-pack",   1 },
+                    { "chemical-science-pack",   1 },
+                    { "utility-science-pack",    1 },
+                    { "space-science-pack",      1 },
+                    { "cryogenic-science-pack",  1 },
+                },
+                time = 30
+            }
+        },
+    })
+end
 
 data:extend({
     {
@@ -57,7 +114,8 @@ data:extend({
         name = "huge-tiberium-asteroid-fall",
         layers = {
             {
-                filename = "__tiberium-asteroids__/graphics/entity/asteroid/tiberium/huge/asteroid-tiberium-huge-colour-01.png",
+                filename =
+                "__tiberium-asteroids__/graphics/entity/asteroid/tiberium/huge/asteroid-tiberium-huge-colour-01.png",
                 height = 512,
                 width = 512,
                 priority = "high",
@@ -83,7 +141,7 @@ data:extend({
                 scale = 2,
                 blend_mode = "additive",
                 draw_as_glow = true,
-                tint = {0.1, 0.5, 0.1, 0.5}
+                tint = { 0.1, 0.5, 0.1, 0.5 }
             }
         }
     }
